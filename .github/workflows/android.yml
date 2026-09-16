@@ -21,6 +21,9 @@ jobs:
 
       - name: Fix gradlew permission
         run: chmod +x ./gradlew
+      
+      - name: Regenerate Gradle Wrapper
+        run: gradle wrapper --gradle-version 8.7
 
       - name: Show project structure
         run: |
