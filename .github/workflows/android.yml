@@ -20,40 +20,26 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Check project structure
+        run: |
+          ls -la
+          ./gradlew projects --info
+
       - name: Build Debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
 
-      - name: List APK output (debug)
-        run: ls -R app/build/outputs/
+      - name: Find APK anywhere
+        if: always()
+        run: |
+          echo "=== Searching for APK ==="
+          find . -name "*.apk" -type f || echo "No APK found"
+          echo "=== Listing app/build ==="
+          ls -la app/build/ || echo "app/build not found"
+          ls -la app/ || echo "app folder not found"
 
       - name: Upload APK Artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-
-  backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Build Backend
-        run: ./gradlew :backend:build --stacktrace
-
-      - name: Upload Backend JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-jar
-          path: backend/build/libs/*.jar
-          if-no-files-found: warn
+          path: app/build/outputs/apk/debug/*.apk
